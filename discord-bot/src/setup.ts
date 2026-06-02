@@ -1,7 +1,10 @@
 import path from "node:path";
 import dotenv from "dotenv";
-const rootDir = path.resolve(process.cwd(), "..", "..");
-dotenv.config({ path: path.join(rootDir, ".env.local") });
+
+// Load .env.local from current dir, repository root, or workspace parent
+dotenv.config({ path: path.join(process.cwd(), ".env.local") });
+dotenv.config({ path: path.join(process.cwd(), "..", ".env.local") });
+dotenv.config({ path: path.join(process.cwd(), "..", "..", ".env.local") });
 
 import {
   Client,
@@ -37,7 +40,7 @@ async function findOrCreateRole(guild: Guild, name: string, color: number, permi
     name,
     colors: { primaryColor: color },
     permissions,
-    reason: "Frinter Core setup",
+    reason: "AI CORE setup",
   });
   console.log(`  [CREATE] Role "${name}"`);
   return role;
@@ -107,7 +110,7 @@ async function setupCategory(
       name: def.name,
       type: ChannelType.GuildCategory,
       permissionOverwrites: permOverwrites,
-      reason: "Frinter Core setup",
+      reason: "AI CORE setup",
     }) as CategoryChannel;
     console.log(`  [CREATE] Category "${def.name}"`);
   } else {
@@ -149,7 +152,7 @@ async function setupCategory(
       parent: category.id,
       topic: chDef.topic,
       permissionOverwrites: channelOverwrites.length > 0 ? channelOverwrites : undefined,
-      reason: "Frinter Core setup",
+      reason: "AI CORE setup",
     });
     console.log(`  [CREATE] #${chDef.name}`);
   }
@@ -167,12 +170,10 @@ async function postRulesEmbed(guild: Guild): Promise<void> {
   }
 
   const messages = await rulesChannel.messages.fetch({ limit: 10 });
-  const botMessage = messages.find(
-    (m) => m.author.id === client.user!.id && m.components.length > 0
-  );
-  if (botMessage) {
-    console.log("  [SKIP] Rules embed already posted");
-    return;
+  const botMessages = messages.filter((m) => m.author.id === client.user!.id);
+  for (const [_, msg] of botMessages) {
+    await msg.delete().catch(() => {});
+    console.log(`  [DELETE] Deleted old rules message (${msg.id})`);
   }
 
   const embed = new EmbedBuilder()
@@ -192,7 +193,7 @@ async function postRulesEmbed(guild: Guild): Promise<void> {
 }
 
 async function main() {
-  console.log("🔧 Frinter Core — Discord Server Setup\n");
+  console.log("🔧 AI CORE — Discord Server Setup\n");
 
   await client.login(TOKEN);
   console.log(`Logged in as ${client.user!.tag}`);

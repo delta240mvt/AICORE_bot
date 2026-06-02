@@ -3,12 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node ../../scripts/monorepo/noop-build.mjs discord-bot",
-    "start": "tsx src/index.ts",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
     "setup": "tsx src/setup.ts"
   },
   "dependencies": {
+    "discord-interactions": "^4.4.0",
     "discord.js": "^14.25.1",
     "dotenv": "^16.6.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260602.1",
+    "wrangler": "^4.96.0"
   }
 }

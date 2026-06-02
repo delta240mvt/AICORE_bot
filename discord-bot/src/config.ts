@@ -1,5 +1,3 @@
-import { PermissionFlagsBits, ButtonStyle } from "discord.js";
-
 // ── Brand Colors (as Discord integer format) ─────────────────────
 export const COLORS = {
   GOLD: 0xd6b779,
@@ -11,8 +9,8 @@ export const COLORS = {
 
 // ── Role Definitions ─────────────────────────────────────────────
 export const ROLES = [
-  { name: "Admin", color: COLORS.GOLD, permissions: [PermissionFlagsBits.Administrator] },
-  { name: "Moderator", color: COLORS.VIOLET, permissions: [PermissionFlagsBits.ManageMessages, PermissionFlagsBits.MuteMembers, PermissionFlagsBits.KickMembers] },
+  { name: "Admin", color: COLORS.GOLD, permissions: [8n] /* Administrator */ },
+  { name: "Moderator", color: COLORS.VIOLET, permissions: [8192n, 4194304n, 2n] /* ManageMessages, MuteMembers, KickMembers */ },
   { name: "Founding Builder", color: COLORS.TEAL, permissions: [] },
   { name: "Builder", color: COLORS.WHITE, permissions: [] },
 ] as const;
@@ -34,8 +32,8 @@ export const CATEGORIES: CategoryDef[] = [
     name: "📋 ONBOARDING",
     visibleTo: "everyone",
     channels: [
-      { name: "rules", topic: "Read the rules and click the button to join." },
-      { name: "welcome", topic: "Welcome messages for new members." },
+      { name: "rules", topic: "Przeczytaj regulamin i kliknij przycisk poniżej, aby dołączyć." },
+      { name: "welcome", topic: "Powitania nowych członków społeczności." },
     ],
   },
   {
@@ -50,49 +48,38 @@ export const CATEGORIES: CategoryDef[] = [
     ],
   },
   {
-    name: "🌍 GLOBAL (EN)",
-    visibleTo: "builders",
-    channels: [
-      { name: "en-general", topic: "Casual chat in English" },
-      { name: "en-showcase", topic: "Show what you're building" },
-      { name: "en-help", topic: "Questions, problems, code review" },
-      { name: "en-resources", topic: "Links, tutorials, tools" },
-      { name: "en-offtopic", topic: "Memes, random, casual" },
-    ],
-  },
-  {
     name: "🔧 ADMIN",
     visibleTo: "admin",
     channels: [
-      { name: "admin-chat", topic: "Internal discussions" },
-      { name: "admin-logs", topic: "Bot logs, joins, leaves" },
+      { name: "admin-chat", topic: "Wewnętrzne rozmowy administracji" },
+      { name: "admin-logs", topic: "Logi bota, dołączenia, wyjścia" },
     ],
   },
 ];
 
 // ── Messages ─────────────────────────────────────────────────────
 export const RULES_EMBED = {
-  title: "Welcome to Frinter Core!",
+  title: "Witaj w AI CORE!",
   description: [
-    "A community for builders creating with AI.",
+    "Społeczność twórców budujących przy użyciu AI.",
     "",
-    "**Rules:**",
-    "1. Respect others — zero hate, zero drama",
-    "2. Write in Polish in 🇵🇱, in English in 🌍",
-    "3. Showcase > self-promo — show what you build, don't spam links",
-    "4. Help others — you were a beginner once",
-    "5. No NSFW, no politics",
+    "**Zasady:**",
+    "1. Szanuj innych — zero nienawiści, dram i toksyczności",
+    "2. Pisz po polsku na odpowiednich kanałach",
+    "3. Twórczość > autoreklama — pokazuj to, co budujesz, nie spamuj samymi linkami",
+    "4. Pomagaj innym — każdy z nas kiedyś zaczynał",
+    "5. Zakaz treści NSFW oraz tematów politycznych",
     "",
-    "Click the button below to join.",
+    "Kliknij przycisk poniżej, aby dołączyć.",
   ].join("\n"),
   color: COLORS.GOLD,
 };
 
 export const WELCOME_MESSAGE_TEMPLATE = (userId: string) =>
-  `**Welcome <@${userId}>!** You're now part of Frinter Core — a community of builders creating with AI. Show what you're building in #pl-showcase / #en-showcase or ask for help in #pl-help / #en-help. Let's build!`;
+  `**Witaj <@${userId}>!** Jesteś teraz częścią AI CORE — społeczności twórców budujących z AI. Pokaż co tworzysz na kanale #pl-showcase lub poproś o pomoc na #pl-help. Budujmy razem!`;
 
 export const ACCEPT_BUTTON = {
   customId: "accept-rules",
-  label: "I accept the rules",
-  style: ButtonStyle.Success,
+  label: "Akceptuję regulamin",
+  style: 3, // ButtonStyle.Success
 } as const;
