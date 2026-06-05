@@ -5,6 +5,10 @@ import {
 } from "discord-interactions";
 import { ACCEPT_BUTTON, WELCOME_MESSAGE_TEMPLATE } from "./config.js";
 
+export const BUILDER_ROLE_NAME = "Builder";
+export const WELCOME_CHANNEL_NAME = "witaj";
+export const ADMIN_LOG_CHANNEL_NAME = "admin-logs";
+
 export interface Env {
   DISCORD_PUBLIC_KEY: string;
   DISCORD_TOKEN: string;
@@ -24,22 +28,33 @@ async function discordFetch(endpoint: string, env: Env, init?: RequestInit) {
   return res;
 }
 
+export function buildAssignRoleRequest(): RequestInit {
+  return { method: "PUT" };
+}
+
 // Fetch the Builder role ID by name
 async function getBuilderRoleId(env: Env): Promise<string | null> {
   const res = await discordFetch(`/guilds/${env.DISCORD_GUILD_ID}/roles`, env);
   if (!res.ok) return null;
   const roles = await res.json() as { id: string; name: string }[];
-  const builderRole = roles.find((r) => r.name === "Builder");
+  const builderRole = roles.find((r) => r.name === BUILDER_ROLE_NAME);
   return builderRole ? builderRole.id : null;
 }
 
-// Fetch a channel ID by name
+// Fetch a channel ID by name (supports text type=0 and forum type=15)
 async function getChannelId(env: Env, channelName: string): Promise<string | null> {
   const res = await discordFetch(`/guilds/${env.DISCORD_GUILD_ID}/channels`, env);
-  if (!res.ok) return null;
+  if (!res.ok) {
+    console.error(`getChannelId: failed to fetch channels, status ${res.status}`);
+    return null;
+  }
   const channels = await res.json() as { id: string; name: string; type: number }[];
-  // type 0 is GUILD_TEXT
-  const channel = channels.find((c) => c.name === channelName && c.type === 0);
+  // type 0 = GUILD_TEXT, type 5 = GUILD_ANNOUNCEMENT, type 15 = GUILD_FORUM
+  const TEXT_TYPES = [0, 5, 15];
+  const channel = channels.find((c) => c.name === channelName && TEXT_TYPES.includes(c.type));
+  if (!channel) {
+    console.error(`getChannelId: channel "${channelName}" not found. Available: ${channels.map(c => `${c.name}(type${c.type})`).join(", ")}`);
+  }
   return channel ? channel.id : null;
 }
 
@@ -93,14 +108,17 @@ export default {
         
         ctx.waitUntil((async () => {
           try {
+            console.log(`[ONBOARD] User ${userId} clicked accept rules`);
+
             const roleId = await getBuilderRoleId(env);
             if (!roleId) {
-              console.error("Builder role not found.");
+              console.error("[ONBOARD] Builder role not found on server!");
               return;
             }
+            console.log(`[ONBOARD] Found Builder role: ${roleId}`);
 
             if (member.roles.includes(roleId)) {
-              // User already has the role, no action needed
+              console.log(`[ONBOARD] User ${userId} already has Builder role, skipping`);
               return;
             }
 
@@ -108,30 +126,44 @@ export default {
             const assignRes = await discordFetch(
               `/guilds/${env.DISCORD_GUILD_ID}/members/${userId}/roles/${roleId}`,
               env,
-              { method: "PUT", body: JSON.stringify({ reason: "Accepted rules via onboarding button" }) }
+              buildAssignRoleRequest()
             );
 
-            if (assignRes.ok) {
-              // Send welcome message
-              const welcomeChannelId = await getChannelId(env, "welcome");
+            if (assignRes.ok || assignRes.status === 204) {
+              console.log(`[ONBOARD] Successfully assigned Builder role to ${userId}`);
+
+              // Send welcome message in #witaj
+              const welcomeChannelId = await getChannelId(env, WELCOME_CHANNEL_NAME);
               if (welcomeChannelId) {
-                await discordFetch(`/channels/${welcomeChannelId}/messages`, env, {
+                const msgRes = await discordFetch(`/channels/${welcomeChannelId}/messages`, env, {
                   method: "POST",
                   body: JSON.stringify({ content: WELCOME_MESSAGE_TEMPLATE(userId) })
                 });
+                if (!msgRes.ok) {
+                  console.error(`[ONBOARD] Failed to send welcome msg: ${msgRes.status} ${await msgRes.text()}`);
+                } else {
+                  console.log(`[ONBOARD] Welcome message sent to #${WELCOME_CHANNEL_NAME}`);
+                }
+              } else {
+                console.error(`[ONBOARD] Welcome channel "${WELCOME_CHANNEL_NAME}" not found.`);
               }
 
               // Send admin log
-              const logChannelId = await getChannelId(env, "admin-logs");
+              const logChannelId = await getChannelId(env, ADMIN_LOG_CHANNEL_NAME);
               if (logChannelId) {
                 await discordFetch(`/channels/${logChannelId}/messages`, env, {
                   method: "POST",
-                  body: JSON.stringify({ content: `[ONBOARD] ${member.user.username}#${member.user.discriminator} (${userId}) accepted rules at ${new Date().toISOString()}` })
+                  body: JSON.stringify({
+                    content: `[ONBOARD] <@${userId}> (${member.user.username}, ${userId}) zaakceptował regulamin — ${new Date().toISOString()}`
+                  })
                 });
               }
+            } else {
+              const errText = await assignRes.text();
+              console.error(`[ONBOARD] Failed to assign ${BUILDER_ROLE_NAME} role to ${userId}: HTTP ${assignRes.status} — ${errText}`);
             }
           } catch (e) {
-            console.error("Failed to assign role or send messages", e);
+            console.error("[ONBOARD] Exception during role/message handling:", e);
           }
         })());
 

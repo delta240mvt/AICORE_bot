@@ -3,6 +3,10 @@ main = "src/worker.ts"
 compatibility_date = "2024-04-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Environment variables that are safe to check in can go here
-# Keep secrets like DISCORD_TOKEN out of here!
-# Use `npx wrangler secret put DISCORD_TOKEN` to set secrets.
+# Non-secret environment variables
+[vars]
+DISCORD_GUILD_ID = "1481751053073649794"
+
+# Secrets must be set via CLI (not stored here):
+#   npx wrangler secret put DISCORD_TOKEN
+#   npx wrangler secret put DISCORD_PUBLIC_KEY
