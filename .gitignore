@@ -1,9 +1,7 @@
 # Dependencies
 node_modules/
 /dist/
-/.svelte-kit/
-/.next/
-/.astro/
+/.wrangler/
 
 # Environment variables
 .env

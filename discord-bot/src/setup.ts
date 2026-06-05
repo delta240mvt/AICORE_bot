@@ -128,7 +128,7 @@ async function setupCategory(
 
     const channelOverwrites = [];
 
-    if (chDef.name === "rules") {
+    if (chDef.name === "zasady") {
       channelOverwrites.push(
         { id: guild.id, allow: [PermissionFlagsBits.ViewChannel], deny: [PermissionFlagsBits.SendMessages] },
         { id: builderRole.id, deny: [PermissionFlagsBits.ViewChannel] },
@@ -136,7 +136,7 @@ async function setupCategory(
       );
     }
 
-    if (chDef.name === "welcome") {
+    if (chDef.name === "witaj") {
       channelOverwrites.push(
         { id: guild.id, deny: [PermissionFlagsBits.ViewChannel] },
         { id: builderRole.id, allow: [PermissionFlagsBits.ViewChannel], deny: [PermissionFlagsBits.SendMessages] },
@@ -162,10 +162,10 @@ async function postRulesEmbed(guild: Guild): Promise<void> {
   console.log("\n── Posting rules embed ──");
 
   const rulesChannel = guild.channels.cache.find(
-    (ch) => ch.name === "rules" && ch.type === ChannelType.GuildText
+    (ch) => ch.name === "zasady" && ch.type === ChannelType.GuildText
   );
   if (!rulesChannel || !rulesChannel.isTextBased()) {
-    console.error("  [ERROR] #rules channel not found");
+    console.error("  [ERROR] #zasady channel not found");
     return;
   }
 

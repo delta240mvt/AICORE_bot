@@ -32,8 +32,8 @@ export const CATEGORIES: CategoryDef[] = [
     name: "📋 ONBOARDING",
     visibleTo: "everyone",
     channels: [
-      { name: "rules", topic: "Przeczytaj regulamin i kliknij przycisk poniżej, aby dołączyć." },
-      { name: "welcome", topic: "Powitania nowych członków społeczności." },
+      { name: "zasady", topic: "Przeczytaj regulamin i kliknij przycisk poniżej, aby dołączyć." },
+      { name: "witaj", topic: "Powitania nowych członków społeczności." },
     ],
   },
   {
