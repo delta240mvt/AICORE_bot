@@ -3,6 +3,7 @@ import {
   InteractionResponseType,
   verifyKey,
 } from "discord-interactions";
+import type { ExecutionContext } from "@cloudflare/workers-types";
 import { ACCEPT_BUTTON, WELCOME_MESSAGE_TEMPLATE } from "./config.js";
 
 export const BUILDER_ROLE_NAME = "Builder";
