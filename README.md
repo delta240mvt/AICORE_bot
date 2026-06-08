@@ -1,86 +1,109 @@
-# Frinter Core - Discord Bot (`AICORE_bot`)
+<div align="center">
 
-This repository contains the Discord Bot for the **Frinter Core** community. It manages onboarding, rules acceptance, automated role assignment (such as the `Builder` role), and basic logging for member joins and leaves.
+<pre>
+ █████╗ ██╗     ██████╗ ██████╗ ██████╗ ███████╗
+██╔══██╗██║    ██╔════╝██╔═══██╗██╔══██╗██╔════╝
+███████║██║    ██║     ██║   ██║██████╔╝█████╗  
+██╔══██║██║    ██║     ██║   ██║██╔══██╗██╔══╝  
+██║  ██║██║    ╚██████╗╚██████╔╝██║  ██║███████╗
+╚═╝  ╚═╝╚═╝     ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝
+                                 b o t
+</pre>
 
-The bot is deployed as a **Cloudflare Worker**.
+**Oficjalny bot serwera Discord społeczności AI CORE – miejsca dla twórców budujących z AI.**
 
-## Repository Structure
+[![Discord](https://img.shields.io/discord/1481751053073649794?color=5865F2&logo=discord&logoColor=white)](https://discord.gg/qXSFgtTh8p)
+[![GitGuardian Security](https://img.shields.io/badge/Security-GitGuardian-blue?logo=gitguardian)](https://gitguardian.com)
 
-```
-AICORE_bot/
-├── .gitignore
-├── README.md
-└── discord-bot/
-    ├── package.json
-    ├── wrangler.toml
-    └── src/
-        ├── config.ts  # Role definitions, categories, channels, and message templates
-        ├── worker.ts  # Cloudflare Worker interaction endpoint
-        └── setup.ts   # Guild setup script (creates roles and channels)
-```
+[**Dołącz do nas na Discordzie!**](https://discord.gg/qXSFgtTh8p)
 
-## Setup & Configuration
+</div>
 
-### 1. Prerequisites
-- **Node.js** (v18 or higher recommended)
-- **Discord Bot Token**: Create an application at the [Discord Developer Portal](https://discord.com/developers/applications), add a bot, and make sure to enable the **Server Members Intent** under the Bot tab.
-- **Discord Server (Guild)**: Create a Discord server where you have administrative permissions. Make sure **Developer Mode** is enabled in your Discord client settings to copy IDs.
-- **Cloudflare account** with Workers enabled.
+---
 
-### 2. Environment Variables
-The setup script loads local variables from `.env.local`. The deployed Worker reads secrets from Cloudflare Workers.
+## 🤖 Co robi ten bot?
 
-Create or update `.env.local` with the following details:
+Bot służy do pełnej automatyzacji serwera Discord. Został zaprojektowany tak, by maksymalnie ułatwić zarządzanie społecznością i uprościć dołączanie nowych członków (onboarding):
 
-```env
-DISCORD_TOKEN="YOUR_DISCORD_BOT_TOKEN"
-DISCORD_GUILD_ID="YOUR_DISCORD_SERVER_ID"
-DISCORD_PUBLIC_KEY="YOUR_DISCORD_APPLICATION_PUBLIC_KEY"
-```
+- **Automatyczna konfiguracja (Setup)**: Jeden skrypt samodzielnie tworzy całą strukturę serwera – kategorie (ONBOARDING, POLSKA, ADMIN), odpowiednie kanały (np. `#zasady`, `#witaj`, `#pl-general`, `#admin-logs`) oraz niezbędne role z odpowiednimi uprawnieniami (Admin, Moderator, Founding Builder, Builder).
+- **Prosty system Onboardingu**: Bot publikuje oficjalny regulamin społeczności na kanale `#zasady` w formie ładnej wizytówki (Embed) z interaktywnym przyciskiem "Akceptuję regulamin".
+- **Zarządzanie dostępem (Role Assignment)**: Nowy użytkownik widzi tylko kanał z regulaminem. Po kliknięciu w przycisk bot sprawdza jego status i automatycznie przypisuje mu rolę **Builder**, dając mu dostęp do reszty serwera.
+- **Powiadomienia i Logi**: Bot wita nowych Builderów na kanale `#witaj` oraz wysyła dyskretne informacje o ich dołączeniu na kanał `#admin-logs`.
+- **Działa na krawędzi (Edge)**: Silnik bota został napisany pod Cloudflare Workers. Jest błyskawiczny (serverless), skalowalny w nieskończoność i darmowy w utrzymaniu.
 
-Set the same values as Cloudflare Worker secrets:
+## 🛡️ Bezpieczeństwo
+To repozytorium jest chronione przed wyciekiem danych uwierzytelniających. Zintegrowany **GitGuardian CLI (`ggshield`)** (skonfigurowany jako lokalny `pre-push` git hook) automatycznie skanuje wszystkie zmiany tuż przed ich wysłaniem do zewnętrznego repozytorium na GitHubie.
 
-```bash
-cd discord-bot
-npx wrangler secret put DISCORD_TOKEN
-npx wrangler secret put DISCORD_GUILD_ID
-npx wrangler secret put DISCORD_PUBLIC_KEY
-```
+---
 
-### 3. Installation
-Navigate into the `discord-bot` directory and install dependencies:
+## 🚀 Instrukcja wdrożenia dla Nowego Użytkownika / Agenta AI
 
+Zanim opublikujesz bota za pomocą Cloudflare Workers, musisz zarejestrować swoją aplikację w portalu deweloperskim Discorda i powiązać ją z kodem.
+
+### Krok 1: Konfiguracja w Discord Developer Portal
+1. Wejdź na [Discord Developer Portal](https://discord.com/developers/applications) i zaloguj się.
+2. Kliknij **"New Application"** w prawym górnym rogu. Podaj nazwę (np. `AI CORE Bot`) i zatwierdź.
+3. W zakładce **General Information**:
+   - Skopiuj `Application ID` (przyda się do zaproszenia bota na serwer).
+   - Skopiuj `Public Key` (to będzie Twój `DISCORD_PUBLIC_KEY`).
+4. Przejdź do zakładki **Bot** po lewej stronie:
+   - Kliknij **"Reset Token"** i skopiuj nowy token (zrób to tylko raz, token zniknie!). To Twój `DISCORD_TOKEN`.
+   - Zjedź niżej i odznacz opcję "Public Bot" (dzięki temu tylko Ty możesz go dodawać do serwerów).
+5. Przejdź do zakładki **OAuth2 -> URL Generator**:
+   - W okienku *Scopes* zaznacz `bot` oraz `applications.commands`.
+   - W okienku *Bot Permissions* zaznacz `Administrator` (aby bot mógł nadawać role i tworzyć kanały).
+   - Skopiuj wygenerowany na samym dole strony link, wklej go do przeglądarki i **zaproś bota na swój własny serwer**.
+
+### Krok 2: Przygotowanie środowiska
+Pobierz kod z tego repozytorium i zainstaluj pakiety:
 ```bash
 cd discord-bot
 npm install
 ```
 
-### 4. Guild Initialization (Setup)
-Run the setup script to automatically create roles, categories, channels, and post the interactive rules embed with the Join button:
+### Krok 3: Dodanie sekretów do projektu
+Zarówno środowisko lokalne (do wykonania skryptu Setup), jak i produkcyjne (Cloudflare) potrzebuje tych kluczy.
 
+1. **Konfiguracja lokalna:**
+   W głównym folderze (tam gdzie masz `package.json` lub o poziom wyżej) utwórz plik o nazwie `.env.local` i dodaj do niego:
+   ```ini
+   DISCORD_TOKEN="wklej_tutaj_token_zakladki_bot"
+   DISCORD_GUILD_ID="wklej_id_twojego_serwera"
+   ```
+   *(ID serwera skopiujesz w aplikacji Discord, klikając prawym przyciskiem myszy na jego ikonę i wybierając "Kopiuj ID serwera". Wymaga to włączenia Trybu Dewelopera w ustawieniach Discorda).*
+
+2. **Konfiguracja Cloudflare Workers:**
+   Wpisz w terminalu następujące komendy i podaj odpowiednie wartości:
+   ```bash
+   npx wrangler secret put DISCORD_TOKEN
+   # wklej swój bot token
+   
+   npx wrangler secret put DISCORD_PUBLIC_KEY
+   # wklej Public Key z zakładki General Information
+   ```
+
+3. W pliku `discord-bot/wrangler.toml` upewnij się, że pole `DISCORD_GUILD_ID` ma ustawione poprawne ID Twojego serwera.
+
+### Krok 4: Uruchomienie skryptu konfigurującego strukturę
+Teraz wywołamy skrypt, który połączy się z Discordem, potworzy kanały, kategorie, role i wygeneruje na `#zasady` wiadomość z przyciskiem do akceptacji regulaminu.
 ```bash
-npm run setup
+npx tsx src/setup.ts
 ```
 
-### 5. Local Worker Development
-Start the Cloudflare Worker locally:
-
+### Krok 5: Publikacja logiki Bota do Cloudflare
+Gdy serwer ma już odpowiednią strukturę, wgrywamy kod bota, który ma nasłuchiwać i przetwarzać kliknięcia:
 ```bash
-npm run dev
+npx wrangler deploy
 ```
+Po sukcesie, konsola wypluje adres URL Twojego workera (np. `https://frinter-core-bot.<twoje_konto>.workers.dev`). **Skopiuj ten adres.**
 
-### 6. Deploying to Cloudflare
-Deploy the Worker with Wrangler:
+### Krok 6: Podłączenie bota pod zdarzenia Discorda (Interactions Endpoint)
+Ostatni etap to nakazanie Discordowi wysyłania sygnałów o kliknięciach na ten nowy adres URL:
+1. Wróć do [Discord Developer Portal](https://discord.com/developers/applications).
+2. Przejdź do zakładki **General Information**.
+3. Znajdź pole o nazwie **Interactions Endpoint URL**.
+4. Wklej tam skopiowany przed chwilą adres z Cloudflare.
+5. Zapisz zmiany. Discord wyśle szybki pakiet testowy – jeśli wyświetli sukces, to wszystko działa idealnie!
 
-```bash
-npm run deploy
-```
-
-After deployment, copy the Worker URL into the Discord application's **Interactions Endpoint URL**.
-
-## How Onboarding Works
-1. When a new user joins, they only see the `#zasady` channel under `📋 ONBOARDING`.
-2. They click the "**I accept the rules**" button.
-3. The bot assigns them the `Builder` role.
-4. They are greeted in the `#witaj` channel, and all builder channels under `🇵🇱 POLSKA` become visible to them.
-5. All actions are logged to the private `#admin-logs` channel.
+---
+To tyle! Bot jest aktywny, serverless i gotowy do zarządzania społecznością.
