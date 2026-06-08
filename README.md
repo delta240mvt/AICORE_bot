@@ -61,41 +61,25 @@ cd discord-bot
 npm install
 ```
 
-### Krok 3: Dodanie sekretów do projektu
-Zarówno środowisko lokalne (do wykonania skryptu Setup), jak i produkcyjne (Cloudflare) potrzebuje tych kluczy.
+### Krok 3: Wklejenie sekretów do `.env.local`
+Nie musisz wpisywać żadnych komend ręcznie! Wystarczy, że utworzysz plik `.env.local` w głównym folderze (tam gdzie masz `package.json` lub o poziom wyżej) i wkleisz do niego wszystkie zdobyte klucze:
 
-1. **Konfiguracja lokalna:**
-   W głównym folderze (tam gdzie masz `package.json` lub o poziom wyżej) utwórz plik o nazwie `.env.local` i dodaj do niego:
-   ```ini
-   DISCORD_TOKEN="wklej_tutaj_token_zakladki_bot"
-   DISCORD_GUILD_ID="wklej_id_twojego_serwera"
-   ```
-   *(ID serwera skopiujesz w aplikacji Discord, klikając prawym przyciskiem myszy na jego ikonę i wybierając "Kopiuj ID serwera". Wymaga to włączenia Trybu Dewelopera w ustawieniach Discorda).*
-
-2. **Konfiguracja Cloudflare Workers:**
-   Wpisz w terminalu następujące komendy i podaj odpowiednie wartości:
-   ```bash
-   npx wrangler secret put DISCORD_TOKEN
-   # wklej swój bot token
-   
-   npx wrangler secret put DISCORD_PUBLIC_KEY
-   # wklej Public Key z zakładki General Information
-   ```
-
-3. W pliku `discord-bot/wrangler.toml` upewnij się, że pole `DISCORD_GUILD_ID` ma ustawione poprawne ID Twojego serwera.
-
-### Krok 4: Uruchomienie skryptu konfigurującego strukturę
-Teraz wywołamy skrypt, który połączy się z Discordem, potworzy kanały, kategorie, role i wygeneruje na `#zasady` wiadomość z przyciskiem do akceptacji regulaminu.
-```bash
-npx tsx src/setup.ts
+```ini
+DISCORD_TOKEN="wklej_tutaj_token_z_zakladki_bot"
+DISCORD_PUBLIC_KEY="wklej_tutaj_public_key_z_zakladki_general_information"
+DISCORD_GUILD_ID="wklej_id_twojego_serwera"
 ```
+*(ID serwera skopiujesz w aplikacji Discord, klikając prawym przyciskiem myszy na ikonę serwera i wybierając "Kopiuj ID serwera". Wymaga to włączenia Trybu Dewelopera w ustawieniach Discorda).*
 
-### Krok 5: Publikacja logiki Bota do Cloudflare
-Gdy serwer ma już odpowiednią strukturę, wgrywamy kod bota, który ma nasłuchiwać i przetwarzać kliknięcia:
-```bash
-npx wrangler deploy
-```
-Po sukcesie, konsola wypluje adres URL Twojego workera (np. `https://frinter-core-bot.<twoje_konto>.workers.dev`). **Skopiuj ten adres.**
+### Krok 4: Poproś Agenta AI o wdrożenie (Deploy)
+Gdy plik `.env.local` jest gotowy, po prostu powiedz swojemu Agentowi (np. w edytorze Cursor):
+> "Skonfiguruj środowisko, prześlij sekrety do Cloudflare Workers i opublikuj bota na podstawie pliku .env.local"
+
+**Agent AI automatycznie zrobi za Ciebie resztę:**
+1. Zaktualizuje ID serwera w pliku `discord-bot/wrangler.toml`.
+2. Prześle sekrety do środowiska produkcyjnego Cloudflare (`npx wrangler secret put`).
+3. Uruchomi skrypt konfiguracyjny (`npx tsx src/setup.ts`), który zbuduje strukturę kanałów i wyśle regulamin na `#zasady`.
+4. Opublikuje bota (`npx wrangler deploy`) i poda Ci gotowy adres URL wygenerowany przez konsolę. **Skopiuj ten adres.**
 
 ### Krok 6: Podłączenie bota pod zdarzenia Discorda (Interactions Endpoint)
 Ostatni etap to nakazanie Discordowi wysyłania sygnałów o kliknięciach na ten nowy adres URL:
