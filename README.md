@@ -12,7 +12,7 @@
 
 **Oficjalny bot serwera Discord społeczności AI CORE – miejsca dla twórców budujących z AI.**
 
-[![Discord](https://img.shields.io/discord/1481751053073649794?color=5865F2&logo=discord&logoColor=white)](https://discord.gg/qXSFgtTh8p)
+[![Discord](https://img.shields.io/badge/Discord-AI_CORE-5865F2?logo=discord&logoColor=white)](https://discord.gg/qXSFgtTh8p)
 [![GitGuardian Security](https://img.shields.io/badge/Security-GitGuardian-blue?logo=gitguardian)](https://gitguardian.com)
 
 [**Dołącz do nas na Discordzie!**](https://discord.gg/qXSFgtTh8p)
