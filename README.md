@@ -91,3 +91,7 @@ Ostatni etap to nakazanie Discordowi wysyłania sygnałów o kliknięciach na te
 
 ---
 To tyle! Bot jest aktywny, serverless i gotowy do zarządzania społecznością.
+
+## Autor
+
+Projekt zbudowałem ja, Przemysław Filipiak. Historię projektu, decyzje i wnioski opisuję na moim portalu: [AICORE_bot w portfolio delta240mvt](https://delta240mvt.com/portfolio/aicore-bot/). Na [delta240mvt.com](https://delta240mvt.com/) piszę dla twórców AI: testy narzędzi i modeli, poradniki do Claude Code, Codexa i modeli lokalnych oraz codzienne AI News.
